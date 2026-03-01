@@ -1,0 +1,75 @@
+services:
+
+  # ── Ollama: local LLM backend (RTX 5090, 32GB VRAM) ──────────────────────
+  # Uses the existing "ollama" Docker volume so already-downloaded models are
+  # preserved.  Stop your standalone container first if you switch to this:
+  #   docker stop ollama && docker rm ollama
+  # Then: docker compose up -d ollama
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # ── Redis: message bus + task queue ─────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  # ── ChromaDB: vector store for file memory / RAG ──────────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+      - CHROMA_SERVER_AUTHN_CREDENTIALS_PROVIDER=
+
+  # ── MQTT broker: Jetson ↔ 5090 communication ─────────────────────────────
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_logs:/mosquitto/log
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  # ── Optional: Redis Commander for debugging ───────────────────────────────
+  # redis-commander:
+  #   image: rediscommander/redis-commander:latest
+  #   environment:
+  #     - REDIS_HOSTS=local:redis:6379
+  #   ports:
+  #     - "8082:8081"
+  #   depends_on:
+  #     - redis
+
+volumes:
+  redis_data:
+  chroma_data:
+  mosquitto_data:
+  mosquitto_logs:
+  # Points to the existing Docker volume created by your standalone ollama container.
+  # Run `docker volume ls` to confirm the volume name (default is "ollama").
+  ollama_models:
+    external: true
+    name: ollama
