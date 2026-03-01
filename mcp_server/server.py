@@ -6,7 +6,7 @@ can invoke them directly.
 
 Transport: stdio (for Claude Desktop integration)
 Tool names use the format:  <skill_name>__<action_name>
-  e.g. reminder__create_reminder, discord_notify__send_message
+  e.g. reminder__create_reminder, discord__send_message
 
 Usage in claude_desktop_config.json:
   {

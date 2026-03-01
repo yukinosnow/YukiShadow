@@ -33,11 +33,15 @@ agent_runner = AgentRunner(skill_registry)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ── Startup ───────────────────────────────────────────────────────────────
-    await message_bus.connect()
+    await message_bus.connect()          # optional — warns but does not crash
     await init_db()
     await skill_registry.load_all()
+    agent_runner.build_system_prompt()   # build once after all skills are loaded
     queue_task = asyncio.create_task(agent_runner.run_queue())
-    logger.info("Orchestrator ready")
+    if message_bus.connected:
+        logger.info("Orchestrator ready (Redis ✓)")
+    else:
+        logger.info("Orchestrator ready (Redis offline — HTTP-only mode)")
 
     yield
 
@@ -64,7 +68,10 @@ app = FastAPI(
 
 class ChatRequest(BaseModel):
     content: str
-    context: dict | None = None
+    # Identifies the conversation so history is shared across turns.
+    # Use a Discord channel ID, a user ID, or any stable string.
+    # Defaults to "api_default" so all bare API calls share one history.
+    channel_id: str = "api_default"
 
 
 class SkillExecuteRequest(BaseModel):
@@ -82,8 +89,14 @@ async def health():
 
 @app.post("/chat")
 async def chat(req: ChatRequest):
-    result = await agent_runner.process(req.content, req.context)
+    result = await agent_runner.process(req.content, channel_id=req.channel_id)
     return result
+
+
+@app.delete("/chat/history/{channel_id}")
+async def clear_history(channel_id: str):
+    agent_runner.clear_history(channel_id)
+    return {"cleared": channel_id}
 
 
 @app.post("/skills/execute")

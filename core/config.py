@@ -67,6 +67,7 @@ class Settings(BaseSettings):
 
     # ── Service ports ─────────────────────────────────────────────────────────
     orchestrator_port: int = 8080
+    discord_service_port: int = 8090   # Discord bot sidecar HTTP server
     mcp_port: int = 8765  # Reserved; currently MCP runs over stdio
 
     # ── Computed helpers ──────────────────────────────────────────────────────
@@ -86,6 +87,10 @@ class Settings(BaseSettings):
     @property
     def orchestrator_base_url(self) -> str:
         return f"http://localhost:{self.orchestrator_port}"
+
+    @property
+    def discord_service_url(self) -> str:
+        return f"http://localhost:{self.discord_service_port}"
 
 
 # Singleton – import this everywhere

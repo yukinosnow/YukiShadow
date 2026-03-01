@@ -27,24 +27,38 @@ class MessageBus:
 
     def __init__(self) -> None:
         self._redis: aioredis.Redis | None = None
+        self.connected: bool = False   # True only after a successful ping
 
     async def connect(self) -> None:
+        """
+        Try to connect to Redis and verify with a PING.
+        Logs a warning (does NOT raise) if Redis is unavailable so callers
+        can start without Redis and degrade gracefully.
+        """
         from core.config import settings
-        self._redis = await aioredis.from_url(
-            settings.redis_url,
-            decode_responses=True,
-        )
-        logger.info("MessageBus connected to Redis")
+        try:
+            r = await aioredis.from_url(settings.redis_url, decode_responses=True)
+            await r.ping()
+            self._redis = r
+            self.connected = True
+            logger.info(f"MessageBus connected to Redis ({settings.redis_url})")
+        except Exception as exc:
+            self.connected = False
+            logger.warning(
+                f"Redis unavailable ({exc}) — message bus running in offline mode. "
+                "Skills that require Redis will fall back to HTTP delivery."
+            )
 
     async def disconnect(self) -> None:
         if self._redis:
             await self._redis.aclose()
             self._redis = None
+            self.connected = False
 
     @property
     def redis(self) -> aioredis.Redis:
-        if self._redis is None:
-            raise RuntimeError("MessageBus is not connected. Call connect() first.")
+        if self._redis is None or not self.connected:
+            raise RuntimeError("MessageBus is not connected to Redis.")
         return self._redis
 
     # ── Pub / Sub ─────────────────────────────────────────────────────────────

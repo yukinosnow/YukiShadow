@@ -1,6 +1,6 @@
 ---
-name: discord_notify
-description: Send text messages and rich embeds to Discord channels.
+name: discord
+description: Interact with Discord — send messages, embeds, and notifications to channels.
 version: "0.1.0"
 llm_provider: null
 
@@ -37,17 +37,17 @@ actions:
             description: List of {name, value, inline} field objects.
 ---
 
-# Discord Notify Skill
+# Discord Skill
 
-Delivers messages to Discord. Used by other skills (like Reminder) to notify
-the user, but can also be called directly to send custom messages or updates.
+Interacts with Discord on behalf of the user. Currently supports sending
+messages and rich embeds to any channel the bot has access to.
 
 ## When to use
 
 Invoke this skill when the user:
 - Wants to send a custom message to Discord ("send a Discord message saying…")
-- Another skill needs to notify the user (this happens automatically, so you
-  rarely need to call it directly from user requests)
+- Another skill needs to notify the user (e.g. Reminder fires and calls this
+  skill to deliver the notification — this happens automatically)
 
 ## Usage examples
 
