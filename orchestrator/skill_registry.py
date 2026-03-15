@@ -80,11 +80,11 @@ class SkillRegistry:
         Convention: class name matches <DirName>Skill (case-insensitive).
         Fallback: any BaseSkill subclass defined in that module.
         """
-        skill_py = skill_dir / "skill.py"
+        skill_py = skill_dir / f"{skill_dir.name}_service.py"
         if not skill_py.exists():
             return None
 
-        module_path = f"skills.{skill_dir.name}.skill"
+        module_path = f"skills.{skill_dir.name}.{skill_dir.name}_service"
         try:
             module = importlib.import_module(module_path)
         except Exception:
