@@ -1,7 +1,7 @@
 ---
 name: discord
-description: Interact with Discord — send messages, embeds, and notifications to channels.
-version: "0.1.0"
+description: Interact with Discord — send messages, read channel history, and reply to users.
+version: "0.2.0"
 llm_provider: null
 
 actions:
@@ -35,26 +35,54 @@ actions:
           fields:
             type: array
             description: List of {name, value, inline} field objects.
+
+  get_messages:
+    description: >
+      Fetch recent messages sent by non-bot users from a channel.
+      Returns a list of {id, author_id, author_name, content, timestamp}.
+    parameters:
+      channel_id:
+        type: integer
+        description: >
+          Channel to read from. If omitted, uses DISCORD_NOTIFICATION_CHANNEL_ID.
+      limit:
+        type: integer
+        description: Maximum number of messages to return (default 10, max 100).
+
+  reply_to_message:
+    description: Reply to a specific Discord message by ID.
+    parameters:
+      message_id:
+        type: integer
+        description: ID of the message to reply to.
+      channel_id:
+        type: integer
+        description: Channel the message belongs to.
+      content:
+        type: string
+        description: Reply text content.
 ---
 
 # Discord Skill
 
-Interacts with Discord on behalf of the user. Currently supports sending
-messages and rich embeds to any channel the bot has access to.
+Interacts with Discord on behalf of the user: send notifications, read recent
+messages, and reply directly to users.
 
 ## When to use
 
-Invoke this skill when the user:
-- Wants to send a custom message to Discord ("send a Discord message saying…")
-- Another skill needs to notify the user (e.g. Reminder fires and calls this
-  skill to deliver the notification — this happens automatically)
+| Situation | Action |
+|-----------|--------|
+| Send a notification or status update | `send_message` |
+| Check what users have been saying recently | `get_messages` |
+| Reply to a specific user message | `reply_to_message` |
 
 ## Usage examples
 
 | User says | Action | Key params |
 |-----------|--------|------------|
 | "Send me a Discord message: the build is done" | `send_message` | message="the build is done" |
-| "Post a status update to Discord" | `send_message` | message="...", embed={...} |
+| "What did people say in Discord recently?" | `get_messages` | limit=5 |
+| "Reply to that message saying thanks" | `reply_to_message` | message_id=..., channel_id=..., content="thanks" |
 
 ## Embed tips
 

@@ -131,18 +131,31 @@ def _extract_json(text: str) -> dict:
     Robustly extract a JSON object from LLM output.
     Strips Qwen3 <think>...</think> blocks before parsing.
     Handles: clean JSON, markdown-fenced JSON, JSON embedded in prose.
+    Raises ValueError (not JSONDecodeError) with the offending text included.
     """
-    _, text = _split_think(text)  # strips think tags, returns clean response
+    if not text.strip():
+        raise ValueError("LLM returned empty response after stripping think tags")
 
     m = _JSON_FENCE_RE.search(text)
     if m:
-        return json.loads(m.group(1))
+        candidate = m.group(1)
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"JSON fence found but failed to parse: {e}\n  candidate: {candidate!r}") from e
 
     m = _JSON_OBJ_RE.search(text)
     if m:
-        return json.loads(m.group(0))
+        candidate = m.group(0)
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"JSON object regex matched but failed to parse: {e}\n  candidate: {candidate!r}") from e
 
-    return json.loads(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"No JSON found in LLM output: {e}\n  raw text: {text!r}") from e
 
 
 # ── Agent Runner ───────────────────────────────────────────────────────────────
@@ -241,16 +254,23 @@ class AgentRunner:
         try:
             self._log_messages("→LLM[route]", route_messages)
             routing_resp = await llm_router.chat(route_messages, skill_name="orchestrator")
-            self._log("←LLM[route]", routing_resp.content)
-            routing = _extract_json(routing_resp.content)
-            thinking, response = _split_think(routing_resp.content)
+        except Exception as exc:
+            logger.exception("agent_runner.process: LLM call failed at routing step")
+            self._log("←LLM[route]", f"LLM ERROR: {exc}")
+            routing = {"skill": None, "reply": f"Sorry, the AI model is unavailable: {exc}"}
+        else:
+            raw = routing_resp.content
+            self._log("←LLM[route]", raw)
+            thinking, clean = _split_think(raw)
             if thinking:
                 self._log("THINK[route]", thinking)
-            self._log("LLM[route]", response)
-        except Exception as exc:
-            logger.warning(f"Routing LLM call failed: {exc}")
-            self._log("←LLM[route]", f"ERROR: {exc}")
-            routing = {"skill": None, "reply": f"Sorry, something went wrong: {exc}"}
+            self._log("LLM[route]", clean)
+            try:
+                routing = _extract_json(clean)
+            except ValueError as exc:
+                logger.error(f"agent_runner.process: JSON parse failed at routing step — {exc}")
+                self._log("PARSE ERROR", str(exc))
+                routing = {"skill": None, "reply": f"Sorry, I couldn't parse my own response: {exc}"}
 
         skill_name: str | None = routing.get("skill")
 
@@ -282,16 +302,27 @@ class AgentRunner:
         try:
             self._log_messages(f"→LLM[{skill_name}]", exec_messages)
             exec_resp = await llm_router.chat(exec_messages, skill_name=skill_name)
-            self._log(f"←LLM[{skill_name}]", exec_resp.content)
-            plan = _extract_json(exec_resp.content)
-            thinking, response = _split_think(exec_resp.content)
-            if thinking:
-                self._log(f"THINK[{skill_name}]", thinking)
-            self._log(f"LLM[{skill_name}]", response)
         except Exception as exc:
-            reply = f"I chose skill '{skill_name}' but couldn't plan the action: {exc}"
+            logger.exception(f"agent_runner.process: LLM call failed at execution step (skill={skill_name})")
+            reply = f"I chose skill '{skill_name}' but the AI model is unavailable: {exc}"
             history.append(Message(role="assistant", content=reply))
-            self._log(f"←LLM[{skill_name}]", f"ERROR: {exc}")
+            self._log(f"←LLM[{skill_name}]", f"LLM ERROR: {exc}")
+            self._log("REPLY", reply)
+            return {"type": "reply", "reply": reply}
+
+        raw = exec_resp.content
+        self._log(f"←LLM[{skill_name}]", raw)
+        thinking, clean = _split_think(raw)
+        if thinking:
+            self._log(f"THINK[{skill_name}]", thinking)
+        self._log(f"LLM[{skill_name}]", clean)
+        try:
+            plan = _extract_json(clean)
+        except ValueError as exc:
+            logger.error(f"agent_runner.process: JSON parse failed at execution step (skill={skill_name}) — {exc}")
+            reply = f"I chose skill '{skill_name}' but couldn't parse the action plan: {exc}"
+            history.append(Message(role="assistant", content=reply))
+            self._log("PARSE ERROR", str(exc))
             self._log("REPLY", reply)
             return {"type": "reply", "reply": reply}
 

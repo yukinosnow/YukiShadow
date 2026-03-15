@@ -78,6 +78,12 @@ class SendRequest(BaseModel):
     embed: dict | None = None
 
 
+class ReplyRequest(BaseModel):
+    message_id: int
+    channel_id: int
+    content: str
+
+
 def create_api(bot: "YukiBot") -> FastAPI:
     api = FastAPI(
         title="YukiShadow Discord Service",
@@ -98,6 +104,40 @@ def create_api(bot: "YukiBot") -> FastAPI:
     async def send(req: SendRequest):
         await deliver(bot, req.model_dump())
         return {"ok": True}
+
+    @api.get("/messages")
+    async def get_messages(channel_id: int | None = None, limit: int = 10):
+        from core.config import settings
+        ch_id = channel_id or settings.discord_notification_channel_id
+        if not ch_id:
+            return {"messages": [], "error": "No channel_id provided"}
+        channel = bot.get_channel(int(ch_id))
+        if channel is None:
+            return {"messages": [], "error": f"Channel {ch_id} not found"}
+        messages = []
+        async for msg in channel.history(limit=limit):
+            if msg.author == bot.user:
+                continue
+            messages.append({
+                "id": msg.id,
+                "author_id": msg.author.id,
+                "author_name": str(msg.author),
+                "content": msg.content,
+                "timestamp": msg.created_at.isoformat(),
+            })
+        return {"messages": messages}
+
+    @api.post("/reply")
+    async def reply(req: ReplyRequest):
+        channel = bot.get_channel(req.channel_id)
+        if channel is None:
+            return {"ok": False, "error": f"Channel {req.channel_id} not found"}
+        try:
+            original = await channel.fetch_message(req.message_id)
+            await original.reply(req.content)
+            return {"ok": True}
+        except Exception as exc:
+            return {"ok": False, "error": str(exc)}
 
     return api
 
@@ -132,7 +172,7 @@ class YukiBot(commands.Bot):
     async def on_message(self, message: discord.Message) -> None:
         if message.author == self.user:
             return
-        # Forward plain messages (not commands) to orchestrator via Redis
+        # Auto-reply: plain messages (not commands) go to the orchestrator agent
         if self.redis_connected and not message.content.startswith(self._settings.discord_command_prefix):
             try:
                 from core.message_bus import message_bus
@@ -143,6 +183,13 @@ class YukiBot(commands.Bot):
                     "channel_id": message.channel.id,
                     "guild_id": message.guild.id if message.guild else None,
                 })
+                await message_bus.enqueue("queue:orchestrator", {
+                    "type": "user_request",
+                    "content": message.content,
+                    "reply_channel_id": message.channel.id,
+                    "author_id": message.author.id,
+                })
+                await message.add_reaction("⏳")
             except Exception:
                 logger.debug("Could not forward message to Redis (bus down?)")
         await self.process_commands(message)

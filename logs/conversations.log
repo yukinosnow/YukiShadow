@@ -390,3 +390,111 @@ RESULT : {"type": "skill_call", "skill": "discord", "action": "send_message", "p
   CALL            : discord.send_message  params={"message": "你好！准备好发送Discord通知了。请告诉我你想要发送的具体内容是什么？"}
   OK              : Message sent to Discord (HTTP)
   REPLY           : 好的，我已经在Discord上发送了一条询问消息。请告诉我你想要发送什么具体内容，我会立即帮你发送。
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:48:10] channel=1482602355273891903
+  USER            : 你好
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, read channel history, and reply to users.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skil
+                          … (325 more chars, see SKILL.md)
+    [     user]  你好
+  ←LLM[route]     : {"skill": null, "reply": "你好！我是YukiShadow，你的个人AI助手。有什么我可以帮助你的吗？"}
+  LLM[route]      : {"skill": null, "reply": "你好！我是YukiShadow，你的个人AI助手。有什么我可以帮助你的吗？"}
+  REPLY           : 你好！我是YukiShadow，你的个人AI助手。有什么我可以帮助你的吗？
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:48:41] channel=1482602355273891903
+  USER            : 请问秦朝一共持续了多久？
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, read channel history, and reply to users.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skil
+                          … (325 more chars, see SKILL.md)
+    [     user]  你好
+    [assistant]  你好！我是YukiShadow，你的个人AI助手。有什么我可以帮助你的吗？
+    [     user]  请问秦朝一共持续了多久？
+  ←LLM[route]     : {"skill": null, "reply": "秦朝（前221年—前206年）共持续了15年，是中国历史上第一个中央集权的统一王朝。"}
+  LLM[route]      : {"skill": null, "reply": "秦朝（前221年—前206年）共持续了15年，是中国历史上第一个中央集权的统一王朝。"}
+  REPLY           : 秦朝（前221年—前206年）共持续了15年，是中国历史上第一个中央集权的统一王朝。
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:49:04] channel=1482602355273891903
+  USER            : 清朝有多少个皇帝
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, read channel history, and reply to users.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skil
+                          … (325 more chars, see SKILL.md)
+    [     user]  你好
+    [assistant]  你好！我是YukiShadow，你的个人AI助手。有什么我可以帮助你的吗？
+    [     user]  请问秦朝一共持续了多久？
+    [assistant]  秦朝（前221年—前206年）共持续了15年，是中国历史上第一个中央集权的统一王朝。
+    [     user]  清朝有多少个皇帝
+  ←LLM[route]     : 清朝共有12位皇帝，从努尔哈赤（清太祖）开始，到宣统帝溥仪结束，统治中国从1644年（清军入关）到1912年。
+  ←LLM[route]     : ERROR: Expecting value: line 1 column 1 (char 0)
+  REPLY           : Sorry, something went wrong: Expecting value: line 1 column 1 (char 0)
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:49:18] channel=1482602355273891903
+  USER            : 清朝有多少个皇帝
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, read channel history, and reply to users.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skil
+                          … (325 more chars, see SKILL.md)
+    [     user]  你好
+    [assistant]  你好！我是YukiShadow，你的个人AI助手。有什么我可以帮助你的吗？
+    [     user]  请问秦朝一共持续了多久？
+    [assistant]  秦朝（前221年—前206年）共持续了15年，是中国历史上第一个中央集权的统一王朝。
+    [     user]  清朝有多少个皇帝
+    [assistant]  Sorry, something went wrong: Expecting value: line 1 column 1 (char 0)
+    [     user]  清朝有多少个皇帝
+  ←LLM[route]     : 清朝共有12位皇帝，从顺治帝（1644年）到末代皇帝溥仪（1912年退位），历时268年。
+  ←LLM[route]     : ERROR: Expecting value: line 1 column 1 (char 0)
+  REPLY           : Sorry, something went wrong: Expecting value: line 1 column 1 (char 0)
