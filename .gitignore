@@ -13,3 +13,4 @@ build/
 .venv/
 venv/
 node_modules/
+logs/

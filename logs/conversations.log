@@ -192,3 +192,201 @@ RESULT : {"type": "skill_call", "skill": "discord", "action": "send_message", "p
   CALL            : discord.send_message  params={"message": "测试"}
   OK              : Message sent to Discord (HTTP)
   REPLY           : 消息已成功发送到 Discord。
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:23:29] channel=cli_76471f4e
+  USER            : 你好，请问你是什么模型
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, embeds, and notifications to channels.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skill n
+                          … (322 more chars, see SKILL.md)
+    [     user]  你好，请问你是什么模型
+  ←LLM[route]     : {"skill": null, "reply": "你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？"}
+  LLM[route]      : {"skill": null, "reply": "你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？"}
+  REPLY           : 你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:24:03] channel=cli_76471f4e
+  USER            : 你用的是什么模型作为基地？
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, embeds, and notifications to channels.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skill n
+                          … (322 more chars, see SKILL.md)
+    [     user]  你好，请问你是什么模型
+    [assistant]  你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？
+    [     user]  你用的是什么模型作为基地？
+  ←LLM[route]     : {"skill": null, "reply": "我是一个运行在本地环境的AI助手，基于开源大语言模型构建。具体使用的模型可以根据部署者的配置而变化，常见的包括Qwen、Llama、ChatGLM等系列。我可以专注于处理Discord相关的任务和提醒服务。有什么我可以帮你的吗？"}
+  LLM[route]      : {"skill": null, "reply": "我是一个运行在本地环境的AI助手，基于开源大语言模型构建。具体使用的模型可以根据部署者的配置而变化，常见的包括Qwen、Llama、ChatGLM等系列。我可以专注于处理Discord相关的任务和提醒服务。有什么我可以帮你的吗？"}
+  REPLY           : 我是一个运行在本地环境的AI助手，基于开源大语言模型构建。具体使用的模型可以根据部署者的配置而变化，常见的包括Qwen、Llama、ChatGLM等系列。我可以专注于处理Discord相关的任务和提醒服务。有什么我可以帮你的吗？
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:24:20] channel=cli_76471f4e
+  USER            : 能帮我发一个你好的消息吗？
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, embeds, and notifications to channels.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skill n
+                          … (322 more chars, see SKILL.md)
+    [     user]  你好，请问你是什么模型
+    [assistant]  你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？
+    [     user]  你用的是什么模型作为基地？
+    [assistant]  我是一个运行在本地环境的AI助手，基于开源大语言模型构建。具体使用的模型可以根据部署者的配置而变化，常见的包括Qwen、Llama、ChatGLM等系列。我可以专注于处理Discord相关的任务和提醒服务。有什么我可以帮你的吗？
+    [     user]  能帮我发一个你好的消息吗？
+  ←LLM[route]     : {"skill": "discord"}
+  LLM[route]      : {"skill": "discord"}
+  →LLM[discord]   :
+    [   system]  You are the action planner for the "discord" skill.
+                      Read the skill reference below, then output the exact action and parameters.
+                      
+                      ## Skill Reference
+                      
+                      # Discord Skill
+                      
+                      Interacts with Discord on behalf of the user. Currently supports sending
+                      messages and rich embeds to any channel the bot has access to.
+                      
+                      ## When to use
+                      
+                      Invoke this skill when the user:
+                      - Wants to send a custom message to Discord ("s
+                          … (1187 more chars, see SKILL.md)
+    [     user]  能帮我发一个你好的消息吗？
+  ←LLM[discord]   : {"action": "send_message", "params": {"message": "你好"}, "reply": "已为你发送了'你好'消息到 Discord。"}
+  LLM[discord]    : {"action": "send_message", "params": {"message": "你好"}, "reply": "已为你发送了'你好'消息到 Discord。"}
+  CALL            : discord.send_message  params={"message": "你好"}
+  OK              : Message sent to Discord (HTTP)
+  REPLY           : 已为你发送了'你好'消息到 Discord。
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:24:57] channel=cli_76471f4e
+  USER            : 你能帮我给刚刚发的消息点赞吗？
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, embeds, and notifications to channels.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skill n
+                          … (322 more chars, see SKILL.md)
+    [     user]  你好，请问你是什么模型
+    [assistant]  你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？
+    [     user]  你用的是什么模型作为基地？
+    [assistant]  我是一个运行在本地环境的AI助手，基于开源大语言模型构建。具体使用的模型可以根据部署者的配置而变化，常见的包括Qwen、Llama、ChatGLM等系列。我可以专注于处理Discord相关的任务和提醒服务。有什么我可以帮你的吗？
+    [     user]  能帮我发一个你好的消息吗？
+    [assistant]  已为你发送了'你好'消息到 Discord。
+    [     user]  你能帮我给刚刚发的消息点赞吗？
+  ←LLM[route]     : {"skill": null, "reply": "抱歉，我目前没有给消息添加反应（点赞）的功能。我的 Discord 技能主要用于发送新消息、embeds 和通知。如果你需要点赞，可能需要手动在 Discord 上操作哦。有其他可以帮你的吗？"}
+  LLM[route]      : {"skill": null, "reply": "抱歉，我目前没有给消息添加反应（点赞）的功能。我的 Discord 技能主要用于发送新消息、embeds 和通知。如果你需要点赞，可能需要手动在 Discord 上操作哦。有其他可以帮你的吗？"}
+  REPLY           : 抱歉，我目前没有给消息添加反应（点赞）的功能。我的 Discord 技能主要用于发送新消息、embeds 和通知。如果你需要点赞，可能需要手动在 Discord 上操作哦。有其他可以帮你的吗？
+
+════════════════════════════════════════════════════════════
+[2026-03-15 01:25:30] channel=cli_76471f4e
+  USER            : 能帮我发送一个discord的通知吗？
+  →LLM[route]     :
+    [   system]  You are YukiShadow, a personal AI assistant running locally.
+                      
+                      ## Available Skills
+                      
+                      - **discord**: Interact with Discord — send messages, embeds, and notifications to channels.
+                      - **reminder**: Create and manage time-based reminders that send Discord notifications.
+                      
+                      
+                      ## Response Format
+                      
+                      If a skill should handle the request, output ONLY:
+                      {"skill": "<skill_name>"}
+                      
+                      For general conversation (no skill n
+                          … (322 more chars, see SKILL.md)
+    [     user]  你好，请问你是什么模型
+    [assistant]  你好！我是YukiShadow，一个本地运行的个人AI助手，专注于通过Discord提供提醒和通知服务。有什么可以帮你的吗？
+    [     user]  你用的是什么模型作为基地？
+    [assistant]  我是一个运行在本地环境的AI助手，基于开源大语言模型构建。具体使用的模型可以根据部署者的配置而变化，常见的包括Qwen、Llama、ChatGLM等系列。我可以专注于处理Discord相关的任务和提醒服务。有什么我可以帮你的吗？
+    [     user]  能帮我发一个你好的消息吗？
+    [assistant]  已为你发送了'你好'消息到 Discord。
+    [     user]  你能帮我给刚刚发的消息点赞吗？
+    [assistant]  抱歉，我目前没有给消息添加反应（点赞）的功能。我的 Discord 技能主要用于发送新消息、embeds 和通知。如果你需要点赞，可能需要手动在 Discord 上操作哦。有其他可以帮你的吗？
+    [     user]  能帮我发送一个discord的通知吗？
+  ←LLM[route]     : {"skill": "discord"}
+  LLM[route]      : {"skill": "discord"}
+  →LLM[discord]   :
+    [   system]  You are the action planner for the "discord" skill.
+                      Read the skill reference below, then output the exact action and parameters.
+                      
+                      ## Skill Reference
+                      
+                      # Discord Skill
+                      
+                      Interacts with Discord on behalf of the user. Currently supports sending
+                      messages and rich embeds to any channel the bot has access to.
+                      
+                      ## When to use
+                      
+                      Invoke this skill when the user:
+                      - Wants to send a custom message to Discord ("s
+                          … (1187 more chars, see SKILL.md)
+    [     user]  能帮我发送一个discord的通知吗？
+  ←LLM[discord]   : ```json
+{
+  "action": "send_message",
+  "params": {
+    "message": "你好！准备好发送Discord通知了。请告诉我你想要发送的具体内容是什么？"
+  },
+  "reply": "好的，我已经在Discord上发送了一条询问消息。请告诉我你想要发送什么具体内容，我会立即帮你发送。"
+}
+```
+  LLM[discord]    : ```json
+{
+  "action": "send_message",
+  "params": {
+    "message": "你好！准备好发送Discord通知了。请告诉我你想要发送的具体内容是什么？"
+  },
+  "reply": "好的，我已经在Discord上发送了一条询问消息。请告诉我你想要发送什么具体内容，我会立即帮你发送。"
+}
+```
+  CALL            : discord.send_message  params={"message": "你好！准备好发送Discord通知了。请告诉我你想要发送的具体内容是什么？"}
+  OK              : Message sent to Discord (HTTP)
+  REPLY           : 好的，我已经在Discord上发送了一条询问消息。请告诉我你想要发送什么具体内容，我会立即帮你发送。
